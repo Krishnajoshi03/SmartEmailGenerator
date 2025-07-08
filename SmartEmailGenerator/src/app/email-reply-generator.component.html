@@ -1,0 +1,23 @@
+<div class="email-reply-generator">
+  <h2>Email reply generator</h2>
+  <div class="form-group">
+    <label for="originalEmail">Original email content</label>
+    <textarea id="originalEmail" [(ngModel)]="originalEmail" rows="8" class="large-textarea" placeholder="Paste the original email here..."></textarea>
+  </div>
+  <div class="form-group">
+    <label for="tone">Tone (optional)</label>
+    <select id="tone" [(ngModel)]="tone">
+      <option value="">None</option>
+      <option value="professional">Professional</option>
+      <option value="friendly">Friendly</option>
+      <option value="casual">Casual</option>
+    </select>
+  </div>
+  <button (click)="generateReply()" [disabled]="isLoading || !originalEmail.trim()" class="btn btn-primary">
+    {{ isLoading ? 'Generating...' : 'Generate reply' }}
+  </button>
+  <div class="form-group" *ngIf="true">
+    <label for="generatedReply">Generated reply</label>
+    <textarea id="generatedReply" [(ngModel)]="generatedReply" rows="8" class="large-textarea" readonly></textarea>
+  </div>
+</div>

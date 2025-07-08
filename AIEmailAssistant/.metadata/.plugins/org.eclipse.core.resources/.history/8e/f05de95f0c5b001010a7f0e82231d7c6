@@ -1,0 +1,46 @@
+package com.email_writer.controller;
+
+import java.util.*;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+
+@Service
+public class EmailGeneratorService {
+	@Value("${gemini.api.url}")
+	private String geminiApiUrl;
+
+	@Value("${gemini.api.key}")
+	private String geminiApiKey;
+
+	private final WebClient webclient;
+
+	public EmailGeneratorService(WebClient webClient) {
+		this.webclient = webClient;
+	}
+
+	public String generateEmailReply(EmailRequest emailRequest) {
+		// build prompt
+		String prompt = buildPrompt(emailRequest);
+
+		Map<String, Object> req = Map.of("contents",
+				new Object[] { Map.of("parts", new Object[] { Map.of("text", prompt) }) });
+		String response = webclient.post().uri(geminiApiUrl + geminiApiKey)
+				.header("Content-Type", "application/json")
+				.retrieve().bodyToMono(String.class).block();
+
+	}
+
+	private String buildPrompt(EmailRequest emailRequest) {
+		StringBuilder prompt = new StringBuilder();
+		prompt.append(
+				"Generate a professional email reply for the following email content.Please Don't generate subject line.");
+		if (emailRequest.getTone() != null && !emailRequest.getTone().isEmpty()) {
+			prompt.append("Use a ").append(emailRequest.getTone()).append((" tone"));
+		}
+		prompt.append("\n Original email :\n").append(emailRequest.getEmailContent());
+		return prompt.toString();
+	}
+
+}
